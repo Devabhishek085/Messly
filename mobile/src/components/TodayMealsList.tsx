@@ -24,10 +24,10 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
 
   const getMealIcon = (meal: MealKey, color: string) => {
     switch (meal) {
-      case 'breakfast': return <Coffee size={16} color={color} />;
-      case 'lunch': return <Utensils size={16} color={color} />;
-      case 'snacks': return <Cookie size={16} color={color} />;
-      case 'dinner': return <Moon size={16} color={color} />;
+      case 'breakfast': return <Coffee size={18} strokeWidth={2} color={color} />;
+      case 'lunch': return <Utensils size={18} strokeWidth={2} color={color} />;
+      case 'snacks': return <Cookie size={18} strokeWidth={2} color={color} />;
+      case 'dinner': return <Moon size={18} strokeWidth={2} color={color} />;
     }
   };
 
@@ -50,7 +50,7 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
   };
 
   if (!todayMenu) {
-    return <Text style={styles.loadingText}>Loading today's menu items...</Text>;
+    return <Text style={styles.loadingText}>Loading today's menu schedule...</Text>;
   }
 
   return (
@@ -69,8 +69,8 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
         const iconColor = isCurrent
           ? COLORS.accentForest
           : isCompleted
-          ? COLORS.textDim
-          : COLORS.textInk;
+          ? '#78746C'
+          : '#1C1B1A';
 
         return (
           <View
@@ -84,13 +84,7 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
             {/* Header */}
             <View style={styles.mealHeader}>
               <View style={styles.titleWithMarker}>
-                <View
-                  style={[
-                    styles.iconBox,
-                    isCurrent && styles.iconBoxCurrent,
-                    isCompleted && styles.iconBoxCompleted,
-                  ]}
-                >
+                <View style={styles.iconContainer}>
                   {getMealIcon(meal, iconColor)}
                 </View>
 
@@ -98,23 +92,23 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
                   <Text
                     style={[
                       styles.mealTitle,
-                      isCompleted && styles.textDimmed,
-                      isCurrent && styles.textCurrentTitle,
+                      isCompleted && styles.mealTitleCompleted,
+                      isCurrent && styles.mealTitleCurrent,
                     ]}
                   >
                     {meal.charAt(0).toUpperCase() + meal.slice(1)}
                   </Text>
-                  <Text style={[styles.timingText, isCompleted && styles.textDimmed]}>
+                  <Text style={[styles.timingText, isCompleted && styles.timingTextCompleted]}>
                     {formattedTiming}
                   </Text>
                 </View>
               </View>
 
-              {/* Status Marker Badge */}
+              {/* Status Indicators */}
               {isCompleted && (
-                <View style={styles.statusBadgeCompleted}>
-                  <Check size={12} color={COLORS.textMuted} />
-                  <Text style={styles.statusTextCompleted}>Served</Text>
+                <View style={styles.servedInlineBadge}>
+                  <Check size={14} strokeWidth={2.5} color="#5C665D" />
+                  <Text style={styles.servedInlineText}>Served</Text>
                 </View>
               )}
               {isCurrent && (
@@ -133,12 +127,12 @@ export const TodayMealsList: React.FC<TodayMealsListProps> = ({ todayMenu, timin
             {/* Food items list */}
             <View style={styles.itemsList}>
               {items.length === 0 ? (
-                <Text style={[styles.itemText, styles.textDimmed]}>No items specified</Text>
+                <Text style={styles.emptyText}>No menu items listed</Text>
               ) : (
                 items.map((item, idx) => (
                   <View key={idx} style={styles.itemRow}>
-                    <Text style={[styles.itemBullet, isCompleted && styles.textDimmed]}>•</Text>
-                    <Text style={[styles.itemText, isCompleted && styles.textDimmed]}>
+                    <Text style={[styles.itemBullet, isCompleted && styles.itemBulletCompleted]}>•</Text>
+                    <Text style={[styles.itemText, isCompleted && styles.itemTextCompleted]}>
                       {item}
                     </Text>
                   </View>
@@ -157,25 +151,25 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   sectionHeader: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '800',
-    color: COLORS.textMuted,
-    letterSpacing: 0.8,
-    marginBottom: 10,
+    color: '#686259',
+    letterSpacing: 0.9,
+    marginBottom: 12,
   },
   loadingText: {
     fontSize: 13,
-    color: COLORS.textMuted,
+    color: '#686259',
     textAlign: 'center',
     paddingVertical: 12,
   },
   mealCard: {
-    backgroundColor: COLORS.cardSurface,
-    borderColor: COLORS.border,
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E8E3DA',
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 14,
-    marginBottom: 12,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 14,
     shadowColor: '#1A1918',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.02,
@@ -184,44 +178,30 @@ const styles = StyleSheet.create({
   },
   mealCardCurrent: {
     borderColor: COLORS.accentForest,
-    backgroundColor: '#FAFCF9',
-    borderWidth: 1.5,
+    backgroundColor: '#F4F8F5',
+    borderWidth: 2.5,
   },
   mealCardCompleted: {
-    backgroundColor: COLORS.completedBg,
+    backgroundColor: '#F8F6F0',
     borderColor: '#EAE5DC',
   },
   mealHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    paddingBottom: 8,
+    marginBottom: 12,
+    paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: '#EAE5DC',
   },
   titleWithMarker: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
-  iconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: COLORS.bgPaper,
+  iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  iconBoxCurrent: {
-    backgroundColor: COLORS.accentTint,
-    borderColor: COLORS.accentTintStrong,
-  },
-  iconBoxCompleted: {
-    backgroundColor: '#EBE7DF',
-    borderColor: '#DED8CC',
   },
   titleContainer: {
     flexDirection: 'column',
@@ -229,32 +209,36 @@ const styles = StyleSheet.create({
   },
   mealTitle: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 17,
-    fontWeight: '700',
-    color: COLORS.textInk,
+    fontSize: 19,
+    fontWeight: '800',
+    color: '#181716',
+    letterSpacing: -0.2,
   },
-  textCurrentTitle: {
+  mealTitleCurrent: {
     color: COLORS.accentForest,
   },
-  timingText: {
-    fontSize: 11.5,
-    color: COLORS.textMuted,
-    fontWeight: '500',
-    marginTop: 1,
+  mealTitleCompleted: {
+    color: '#6B655C',
+    fontWeight: '700',
   },
-  statusBadgeCompleted: {
+  timingText: {
+    fontSize: 12.5,
+    color: '#686259',
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  timingTextCompleted: {
+    color: '#78746C',
+  },
+  servedInlineBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: '#EBE7DF',
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    gap: 4,
   },
-  statusTextCompleted: {
-    fontSize: 10.5,
-    fontWeight: '600',
-    color: COLORS.textMuted,
+  servedInlineText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#5C665D',
   },
   statusBadgeCurrent: {
     flexDirection: 'row',
@@ -263,55 +247,64 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accentTint,
     borderColor: COLORS.accentTintStrong,
     borderWidth: 1,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 9,
+    borderRadius: 6,
   },
   dotCurrent: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: COLORS.accentForest,
   },
   statusTextCurrent: {
-    fontSize: 10.5,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
     color: COLORS.accentForest,
   },
   statusBadgeUpcoming: {
-    backgroundColor: COLORS.bgPaper,
-    borderColor: COLORS.border,
+    backgroundColor: '#FAF8F4',
+    borderColor: '#E8E3DA',
     borderWidth: 1,
     paddingVertical: 3,
     paddingHorizontal: 8,
-    borderRadius: 4,
+    borderRadius: 6,
   },
   statusTextUpcoming: {
-    fontSize: 10.5,
-    fontWeight: '500',
-    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#686259',
   },
   itemsList: {
     flexDirection: 'column',
-    gap: 4,
+    gap: 6,
   },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 6,
+    gap: 8,
   },
   itemBullet: {
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.accentForest,
-    lineHeight: 18,
+    lineHeight: 20,
+  },
+  itemBulletCompleted: {
+    color: '#78746C',
   },
   itemText: {
-    fontSize: 13.5,
-    color: COLORS.textInk,
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#181716',
     flexShrink: 1,
-    lineHeight: 19,
+    lineHeight: 21,
   },
-  textDimmed: {
-    color: COLORS.textDim,
+  itemTextCompleted: {
+    color: '#423F3A',
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#78746C',
+    fontStyle: 'italic',
   },
 });

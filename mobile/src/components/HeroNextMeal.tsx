@@ -37,10 +37,10 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
   const getMealIcon = (meal: MealKey, color: string = COLORS.accentForest) => {
     switch (meal) {
-      case 'breakfast': return <Coffee size={20} color={color} />;
-      case 'lunch': return <Utensils size={20} color={color} />;
-      case 'snacks': return <Cookie size={20} color={color} />;
-      case 'dinner': return <Moon size={20} color={color} />;
+      case 'breakfast': return <Coffee size={20} strokeWidth={2} color={color} />;
+      case 'lunch': return <Utensils size={20} strokeWidth={2} color={color} />;
+      case 'snacks': return <Cookie size={20} strokeWidth={2} color={color} />;
+      case 'dinner': return <Moon size={20} strokeWidth={2} color={color} />;
     }
   };
 
@@ -80,7 +80,7 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
   // State 1: NOW SERVING
   if (currentServingMeal) {
-    const mealName = currentServingMeal.toUpperCase();
+    const mealName = currentServingMeal.charAt(0).toUpperCase() + currentServingMeal.slice(1);
     const itemsList = todayMenu[currentServingMeal]?.items || [];
 
     return (
@@ -106,7 +106,7 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
             <View style={styles.iconCircleServing}>
               {getMealIcon(currentServingMeal, COLORS.accentForest)}
             </View>
-            <Text style={styles.mealTitle}>{mealName}</Text>
+            <Text style={styles.mealTitleHero}>{mealName}</Text>
           </View>
 
           <View style={styles.itemsPillContainer}>
@@ -123,7 +123,7 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
   // State 2: UPCOMING MEAL
   if (nextUpcomingMeal) {
-    const mealName = nextUpcomingMeal.toUpperCase();
+    const mealName = nextUpcomingMeal.charAt(0).toUpperCase() + nextUpcomingMeal.slice(1);
     const itemsList = todayMenu[nextUpcomingMeal]?.items || [];
 
     return (
@@ -145,9 +145,9 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
           <View style={styles.titleRow}>
             <View style={styles.iconCircleUpcoming}>
-              {getMealIcon(nextUpcomingMeal, COLORS.textInk)}
+              {getMealIcon(nextUpcomingMeal, '#181716')}
             </View>
-            <Text style={styles.mealTitle}>{mealName}</Text>
+            <Text style={styles.mealTitleHero}>{mealName}</Text>
           </View>
 
           <View style={styles.itemsPillContainer}>
@@ -178,9 +178,9 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
         <View style={styles.titleRow}>
           <View style={styles.iconCircleUpcoming}>
-            <Coffee size={20} color={COLORS.textInk} />
+            <Coffee size={20} strokeWidth={2} color="#181716" />
           </View>
-          <Text style={styles.mealTitle}>Tomorrow's Breakfast</Text>
+          <Text style={styles.mealTitleHero}>Tomorrow's Breakfast</Text>
         </View>
 
         <Text style={styles.foodPreview}>
@@ -193,10 +193,10 @@ export const HeroNextMeal: React.FC<HeroNextMealProps> = ({ todayMenu, timings }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.cardSurface,
-    borderColor: COLORS.border,
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E8E3DA',
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: 14,
     marginBottom: 16,
     overflow: 'hidden',
     shadowColor: '#1A1918',
@@ -206,8 +206,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardNowServing: {
-    backgroundColor: COLORS.accentTint,
-    borderColor: COLORS.accentTintStrong,
+    backgroundColor: '#F4F8F5',
+    borderColor: COLORS.accentForest,
+    borderWidth: 2,
   },
   accentBarServing: {
     height: 4,
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
   },
   accentBarUpcoming: {
     height: 4,
-    backgroundColor: COLORS.textInk,
+    backgroundColor: '#181716',
     width: '100%',
   },
   accentBarCompleted: {
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cardInner: {
-    padding: 16,
+    padding: 18,
   },
   headerRow: {
     flexDirection: 'row',
@@ -234,9 +235,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   badgeText: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: COLORS.textMuted,
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#686259',
     letterSpacing: 0.8,
   },
   upcomingBadge: {
@@ -305,8 +306,8 @@ const styles = StyleSheet.create({
   },
   timeLabel: {
     fontSize: 12,
-    color: COLORS.textMuted,
-    fontWeight: '500',
+    color: '#686259',
+    fontWeight: '600',
   },
   titleRow: {
     flexDirection: 'row',
@@ -315,9 +316,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconCircleServing: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
@@ -325,21 +326,21 @@ const styles = StyleSheet.create({
     borderColor: COLORS.accentTintStrong,
   },
   iconCircleUpcoming: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.bgPaper,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#FAF8F4',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#E8E3DA',
   },
-  mealTitle: {
+  mealTitleHero: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.textInk,
-    letterSpacing: -0.3,
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#181716',
+    letterSpacing: -0.5,
   },
   itemsPillContainer: {
     flexDirection: 'row',
@@ -355,26 +356,27 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   foodChipTextServing: {
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: '600',
     color: COLORS.accentForest,
   },
   foodChipUpcoming: {
-    backgroundColor: COLORS.bgPaper,
-    borderColor: COLORS.border,
+    backgroundColor: '#FAF8F4',
+    borderColor: '#E8E3DA',
     borderWidth: 1,
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 6,
   },
   foodChipTextUpcoming: {
-    fontSize: 12.5,
+    fontSize: 13,
     fontWeight: '500',
-    color: COLORS.textInk,
+    color: '#181716',
   },
   foodPreview: {
-    fontSize: 13.5,
-    color: COLORS.textMuted,
-    lineHeight: 19,
+    fontSize: 14,
+    color: '#686259',
+    fontWeight: '500',
+    lineHeight: 20,
   },
 });

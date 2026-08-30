@@ -9,7 +9,8 @@ import {
   Switch,
   ActivityIndicator,
   Platform,
-  StatusBar
+  StatusBar,
+  Linking
 } from 'react-native';
 import { COLORS } from './src/theme/colors';
 import { ResolvedMenu, MealTimingsMap, RemindersMap, MealKey } from './src/types';
@@ -194,12 +195,12 @@ export default function App() {
       <View style={styles.appHeader}>
         <View>
           <Text style={styles.hostelLabel}>KIET BOYS HOSTEL</Text>
-          <Text style={styles.headerDate}>{formatHeaderDate(currentTime)}</Text>
+          <Text style={styles.headerDateBold}>{formatHeaderDate(currentTime)}</Text>
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.headerClock}>{formatHeaderTime(currentTime)}</Text>
           <TouchableOpacity onPress={loadData} style={styles.refreshBtn}>
-            <RefreshCw size={14} color={COLORS.textMuted} />
+            <RefreshCw size={14} color="#686259" />
           </TouchableOpacity>
         </View>
       </View>
@@ -226,7 +227,7 @@ export default function App() {
             {/* TAB 2: WEEKLY MENU */}
             {activeTab === 'weekly' && (
               <View>
-                <Text style={styles.screenTitle}>Weekly Mess Schedule</Text>
+                <Text style={styles.screenTitleBold}>Weekly Mess Schedule</Text>
                 <Text style={styles.screenSubtitle}>WEF - 27/07/2026 · KIET Boys Hostel Official Schedule</Text>
 
                 {/* Day selector horizontal bar */}
@@ -266,7 +267,7 @@ export default function App() {
                       return (
                         <View key={meal} style={styles.weeklyMealCard}>
                           <View style={styles.weeklyMealHeader}>
-                            <Text style={styles.weeklyMealTitle}>
+                            <Text style={styles.weeklyMealTitleBold}>
                               {meal.charAt(0).toUpperCase() + meal.slice(1)}
                             </Text>
                             <Text style={styles.weeklyMealTiming}>
@@ -294,7 +295,7 @@ export default function App() {
             {/* TAB 3: REMINDERS */}
             {activeTab === 'reminders' && (
               <View>
-                <Text style={styles.screenTitle}>Meal Reminders</Text>
+                <Text style={styles.screenTitleBold}>Meal Reminders</Text>
                 <Text style={styles.screenSubtitle}>
                   Schedule local notifications on your device so you never miss mess hours
                 </Text>
@@ -329,7 +330,7 @@ export default function App() {
                     <View key={meal} style={styles.reminderCard}>
                       <View style={styles.reminderHeader}>
                         <View>
-                          <Text style={styles.reminderMealTitle}>
+                          <Text style={styles.reminderMealTitleBold}>
                             {meal.charAt(0).toUpperCase() + meal.slice(1)}
                           </Text>
                           <Text style={styles.reminderTimingText}>
@@ -380,12 +381,12 @@ export default function App() {
             {/* TAB 4: SETTINGS */}
             {activeTab === 'settings' && (
               <View>
-                <Text style={styles.screenTitle}>Settings & Guidelines</Text>
+                <Text style={styles.screenTitleBold}>Settings & Guidelines</Text>
 
                 <View style={styles.settingsCard}>
                   <Text style={styles.settingsLabel}>Hostel Facility</Text>
                   <Text style={styles.settingsVal}>KIET Group of Institutions, Boys Hostel</Text>
-                  <Text style={{ fontSize: 11.5, color: COLORS.textMuted, marginTop: 2 }}>Official Schedule WEF - 27/07/2026</Text>
+                  <Text style={{ fontSize: 11.5, color: '#686259', marginTop: 2 }}>Official Schedule WEF - 27/07/2026</Text>
                 </View>
 
                 {/* Mess Rules & Compliance Card */}
@@ -400,8 +401,8 @@ export default function App() {
                       <View key={g.id} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6 }}>
                         <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.accentForest }}>{g.id}.</Text>
                         <View style={{ flex: 1 }}>
-                          <Text style={{ fontSize: 12.5, fontWeight: '700', color: COLORS.textInk }}>{g.title}</Text>
-                          <Text style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 16 }}>{g.text}</Text>
+                          <Text style={{ fontSize: 12.5, fontWeight: '700', color: '#181716' }}>{g.title}</Text>
+                          <Text style={{ fontSize: 12, color: '#686259', lineHeight: 16 }}>{g.text}</Text>
                         </View>
                       </View>
                     ))}
@@ -419,6 +420,14 @@ export default function App() {
                     {isOffline ? 'Offline Mode (Using Local Cache)' : 'Online · Connected Live to Messly API'}
                   </Text>
                 </View>
+
+                {/* Issue 6: Understated Footer Credit Line (ONLY at the bottom of Settings screen) */}
+                <View style={styles.footerCreditContainer}>
+                  <Text style={styles.footerCreditText}>Made with ♥ by Abhishek</Text>
+                  <TouchableOpacity onPress={() => Linking.openURL('https://github.com/Devabhishek085')}>
+                    <Text style={styles.footerCreditLink}>github.com/Devabhishek085</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </>
@@ -431,7 +440,7 @@ export default function App() {
           onPress={() => handleTabChange('home')}
           style={[styles.navItem, activeTab === 'home' && styles.navItemActive]}
         >
-          <Utensils size={20} color={activeTab === 'home' ? COLORS.accentForest : COLORS.textMuted} />
+          <Utensils size={20} color={activeTab === 'home' ? COLORS.accentForest : '#686259'} />
           <Text style={[styles.navLabel, activeTab === 'home' && styles.navLabelActive]}>Today</Text>
         </TouchableOpacity>
 
@@ -439,7 +448,7 @@ export default function App() {
           onPress={() => handleTabChange('weekly')}
           style={[styles.navItem, activeTab === 'weekly' && styles.navItemActive]}
         >
-          <Calendar size={20} color={activeTab === 'weekly' ? COLORS.accentForest : COLORS.textMuted} />
+          <Calendar size={20} color={activeTab === 'weekly' ? COLORS.accentForest : '#686259'} />
           <Text style={[styles.navLabel, activeTab === 'weekly' && styles.navLabelActive]}>Weekly</Text>
         </TouchableOpacity>
 
@@ -447,7 +456,7 @@ export default function App() {
           onPress={() => handleTabChange('reminders')}
           style={[styles.navItem, activeTab === 'reminders' && styles.navItemActive]}
         >
-          <Bell size={20} color={activeTab === 'reminders' ? COLORS.accentForest : COLORS.textMuted} />
+          <Bell size={20} color={activeTab === 'reminders' ? COLORS.accentForest : '#686259'} />
           <Text style={[styles.navLabel, activeTab === 'reminders' && styles.navLabelActive]}>Reminders</Text>
         </TouchableOpacity>
 
@@ -455,7 +464,7 @@ export default function App() {
           onPress={() => handleTabChange('settings')}
           style={[styles.navItem, activeTab === 'settings' && styles.navItemActive]}
         >
-          <Settings size={20} color={activeTab === 'settings' ? COLORS.accentForest : COLORS.textMuted} />
+          <Settings size={20} color={activeTab === 'settings' ? COLORS.accentForest : '#686259'} />
           <Text style={[styles.navLabel, activeTab === 'settings' && styles.navLabelActive]}>Settings</Text>
         </TouchableOpacity>
       </View>
@@ -485,11 +494,12 @@ const styles = StyleSheet.create({
     color: COLORS.accentForest,
     letterSpacing: 1,
   },
-  headerDate: {
+  headerDateBold: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textInk,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#181716',
+    letterSpacing: -0.3,
   },
   headerRight: {
     alignItems: 'flex-end',
@@ -499,7 +509,7 @@ const styles = StyleSheet.create({
   headerClock: {
     fontSize: 12,
     fontWeight: '600',
-    color: COLORS.textMuted,
+    color: '#686259',
   },
   refreshBtn: {
     padding: 4,
@@ -517,19 +527,20 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 13,
-    color: COLORS.textMuted,
+    color: '#686259',
     fontWeight: '500',
   },
-  screenTitle: {
+  screenTitleBold: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     fontSize: 22,
-    fontWeight: '700',
-    color: COLORS.textInk,
+    fontWeight: '800',
+    color: '#181716',
     marginBottom: 2,
+    letterSpacing: -0.3,
   },
   screenSubtitle: {
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: '#686259',
     marginBottom: 16,
   },
   daySelectorScroll: {
@@ -539,9 +550,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.cardSurface,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#E8E3DA',
     marginRight: 8,
     alignItems: 'center',
   },
@@ -552,7 +563,7 @@ const styles = StyleSheet.create({
   dayTabLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: COLORS.textInk,
+    color: '#181716',
   },
   dayTabLabelSelected: {
     color: '#FFFFFF',
@@ -568,11 +579,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   weeklyMealCard: {
-    backgroundColor: COLORS.cardSurface,
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
+    borderColor: '#E8E3DA',
+    padding: 16,
     marginBottom: 12,
   },
   weeklyMealHeader: {
@@ -582,38 +593,40 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: '#EAE5DC',
   },
-  weeklyMealTitle: {
+  weeklyMealTitleBold: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textInk,
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#181716',
   },
   weeklyMealTiming: {
-    fontSize: 11.5,
-    color: COLORS.textMuted,
+    fontSize: 12,
+    color: '#686259',
+    fontWeight: '600',
   },
   weeklyItemRowContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 6,
+    gap: 8,
     marginBottom: 4,
   },
   weeklyItemBullet: {
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.accentForest,
-    lineHeight: 18,
+    lineHeight: 20,
   },
   weeklyItemRowText: {
-    fontSize: 13,
-    color: COLORS.textInk,
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#181716',
     flexShrink: 1,
-    lineHeight: 18,
+    lineHeight: 21,
   },
   emptyItemsText: {
     fontSize: 13,
-    color: COLORS.textMuted,
+    color: '#78746C',
     fontStyle: 'italic',
     paddingVertical: 4,
   },
@@ -635,7 +648,7 @@ const styles = StyleSheet.create({
   },
   permissionBody: {
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: '#686259',
     lineHeight: 17,
     marginBottom: 10,
   },
@@ -652,11 +665,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   reminderCard: {
-    backgroundColor: COLORS.cardSurface,
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
+    borderColor: '#E8E3DA',
+    padding: 16,
     marginBottom: 12,
   },
   reminderHeader: {
@@ -664,27 +677,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  reminderMealTitle: {
+  reminderMealTitleBold: {
     fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textInk,
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#181716',
   },
   reminderTimingText: {
     fontSize: 12,
-    color: COLORS.textMuted,
+    color: '#686259',
     marginTop: 2,
   },
   leadTimeSection: {
     marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: '#E8E3DA',
   },
   leadTimeLabel: {
     fontSize: 11.5,
     fontWeight: '600',
-    color: COLORS.textMuted,
+    color: '#686259',
     marginBottom: 6,
   },
   leadTimeOptions: {
@@ -697,7 +710,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: COLORS.bgPaper,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: '#E8E3DA',
   },
   leadPillSelected: {
     backgroundColor: COLORS.accentForest,
@@ -706,24 +719,24 @@ const styles = StyleSheet.create({
   leadPillText: {
     fontSize: 11.5,
     fontWeight: '500',
-    color: COLORS.textMuted,
+    color: '#686259',
   },
   leadPillTextSelected: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
   settingsCard: {
-    backgroundColor: COLORS.cardSurface,
-    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: 14,
+    borderColor: '#E8E3DA',
+    padding: 16,
     marginBottom: 12,
   },
   settingsLabel: {
     fontSize: 11.5,
     fontWeight: '700',
-    color: COLORS.textMuted,
+    color: '#686259',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 2,
@@ -731,13 +744,31 @@ const styles = StyleSheet.create({
   settingsVal: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textInk,
+    color: '#181716',
+  },
+  footerCreditContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 24,
+    paddingBottom: 16,
+    gap: 2,
+  },
+  footerCreditText: {
+    fontSize: 12,
+    color: '#7A756C',
+    fontWeight: '500',
+  },
+  footerCreditLink: {
+    fontSize: 12,
+    color: COLORS.accentForest,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: COLORS.cardSurface,
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
+    borderTopColor: '#E8E3DA',
     paddingVertical: 8,
   },
   navItem: {
@@ -749,7 +780,7 @@ const styles = StyleSheet.create({
   navItemActive: {},
   navLabel: {
     fontSize: 11,
-    color: COLORS.textMuted,
+    color: '#686259',
     fontWeight: '500',
   },
   navLabelActive: {
