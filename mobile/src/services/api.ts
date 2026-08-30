@@ -8,18 +8,78 @@ import {
   getCachedTimings
 } from './storage';
 
-// API Base URL - uses environment variable EXPO_PUBLIC_API_URL if set, or defaults to localhost
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'https://messly.onrender.com/api';
 
 export interface FetchResult<T> {
   data: T;
   isOffline: boolean;
 }
 
+// Complete 7-Day Exact KIET Noticeboard Menu Fallback
+export const EXACT_KIET_WEEKLY_FALLBACK: ResolvedMenu[] = [
+  {
+    date: '2026-08-24',
+    dayOfWeek: 'monday',
+    breakfast: { items: ["Veg Cutlet", "Boiled Egg", "Brown Bread with Butter", "Jam", "Sauce", "Tea", "Milk"] },
+    lunch: { items: ["Rajma", "Kundru / Aloo Beans (alt)", "Boondi Raita", "Roti", "Rice", "Salad", "Pickle"] },
+    snacks: { items: ["Bread Pakoda / Burger (alt)", "Sauce", "Lemon Shikanji"] },
+    dinner: { items: ["Matar Paneer / Kadhai Paneer (alt)", "Mix Veg", "Vegetable Pulao", "Roti", "Salad", "Pickle", "Custard"] }
+  },
+  {
+    date: '2026-08-25',
+    dayOfWeek: 'tuesday',
+    breakfast: { items: ["Pav Bhaji", "Tea", "Milk"] },
+    lunch: { items: ["Kali Masoor / Mix Dal (alt)", "Seasonal Veg", "Jeera Rice", "Fruit Raita", "Roti", "Salad", "Pickle"] },
+    snacks: { items: ["French Fries with Sauce", "Tea"] },
+    dinner: { items: ["Puri", "Pindi Chole", "Petha", "Green Peas Pulao", "Salad", "Pickle"] }
+  },
+  {
+    date: '2026-08-26',
+    dayOfWeek: 'wednesday',
+    breakfast: { items: ["Chana (onion-tomato-green chilly) & Halwa", "Tea", "Milk", "Poha with besan bhujia & Daliya (alt) + Tea"] },
+    lunch: { items: ["Arhar Dal (fry)", "Mix-Veg", "Bundi Raita", "Roti", "Rice", "Salad", "Pickle"] },
+    snacks: { items: ["Vada-pav / Veg Pasta (alt)", "Sauce", "Tea"] },
+    dinner: { items: ["Udad Chana (Fry)", "Bhindi / Veg. Kofta (alt)", "Roti", "Fried Rice", "Salad", "Pickle", "Sponge Rasgulla"] }
+  },
+  {
+    date: '2026-08-27',
+    dayOfWeek: 'thursday',
+    breakfast: { items: ["Stuffed Puri", "Aloo Sabji (Gravy)", "Pickle", "Tea", "Milk"] },
+    lunch: { items: ["Kadhi Pakoda", "Jeera Aloo", "Roti", "Rice", "Salad", "Pickle"] },
+    snacks: { items: ["Mix-Veg Pakodi with Green Chutney + Sauce", "Aloo Tikki with matar + Green & Red Chutney (alt)", "Shikanji"] },
+    dinner: { items: ["Kali Masoor / Lauki Chana dal", "Arbi / Aloo-Soyabean (alt)", "Roti", "Veg Pulao", "Salad", "Pickle"] }
+  },
+  {
+    date: '2026-08-28',
+    dayOfWeek: 'friday',
+    breakfast: { items: ["Cornflakes / Sprouts", "Boiled Egg / Bread Roll", "Bread Butter", "Sauce", "Tea", "Milk"] },
+    lunch: { items: ["Kala Chana (gravy)", "Aloo Pyaz Bhujiya", "Roti", "Jeera Rice", "Veg Raita", "Salad", "Pickle"] },
+    snacks: { items: ["Samosa", "Chole", "Meethi Chatni", "Green Chutney", "Tea"] },
+    dinner: { items: ["Shahi Paneer / Paneer 2 Pyaja (alt)", "Egg Curry", "Aloo Shimla Mirch", "Jeera Rice", "Roti", "Salad", "Pickle", "Ice Cream"] }
+  },
+  {
+    date: '2026-08-29',
+    dayOfWeek: 'saturday',
+    breakfast: { items: ["Aloo-Pyaz Paratha", "Pickle", "Plain Dahi", "Sauce", "Tea"] },
+    lunch: { items: ["Veg Biryani / Tehari (Veg.Pulao)", "Papad", "Green Chutney", "Salad", "Bundi Raita", "Pickle"] },
+    snacks: { items: ["Fried Idli / Jave (alt)", "Sauce", "Tea"] },
+    dinner: { items: ["Dal Panch-mel", "Mix Veg", "Jeera Rice", "Roti", "Salad", "Pickle"] }
+  },
+  {
+    date: '2026-08-30',
+    dayOfWeek: 'sunday',
+    breakfast: { items: ["Idli Sambhar", "Nariyal Chutney", "Plain Parantha with Aloo Tamatar Sabji (alt)", "Tea"] },
+    lunch: { items: ["Chole Bhature", "Fried Aloo", "Jeera Rice", "Boondi Raita", "Fried Mirchi", "Salad", "Pickle"] },
+    snacks: { items: ["Aloo Sandwich / Bhelpuri (alt)", "Sauce", "Roohafza"] },
+    dinner: { items: ["Dal Makhani", "Aloo Beans", "Roti", "Rice", "Salad", "Pickle"] }
+  }
+];
+
 export const fetchTodayMenu = async (): Promise<FetchResult<ResolvedMenu>> => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    // 12 second timeout to gracefully handle Render free tier cold-start spin ups
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(`${API_BASE}/menu/today`, { signal: controller.signal });
     clearTimeout(timeoutId);
@@ -36,19 +96,10 @@ export const fetchTodayMenu = async (): Promise<FetchResult<ResolvedMenu>> => {
       return { data: cached, isOffline: true };
     }
     
-    // Accurate seed fallback matching actual KIET Boys Hostel menu photo
+    // Default to Sunday/current day fallback from complete noticeboard menu
     const todayIndex = new Date().getDay();
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const todayName = dayNames[todayIndex];
-
-    const fallback: ResolvedMenu = {
-      date: new Date().toISOString().split('T')[0],
-      dayOfWeek: todayName,
-      breakfast: { items: ["Idli Sambhar", "Nariyal Chutney / Plain Parantha with Aloo Tamatar Sabji (alt)", "Tea"] },
-      lunch: { items: ["Chole Bhature", "Fried Aloo", "Jeera Rice", "Boondi Raita", "Fried Mirchi", "Salad", "Pickle"] },
-      snacks: { items: ["Aloo Sandwich / Bhelpuri (alt)", "Sauce", "Roohafza"] },
-      dinner: { items: ["Dal Makhani", "Aloo Beans", "Roti", "Rice", "Salad", "Pickle"] },
-    };
+    const fallbackIndex = todayIndex === 0 ? 6 : todayIndex - 1;
+    const fallback = EXACT_KIET_WEEKLY_FALLBACK[fallbackIndex] || EXACT_KIET_WEEKLY_FALLBACK[6];
     return { data: fallback, isOffline: true };
   }
 };
@@ -56,7 +107,7 @@ export const fetchTodayMenu = async (): Promise<FetchResult<ResolvedMenu>> => {
 export const fetchWeekMenu = async (): Promise<FetchResult<ResolvedMenu[]>> => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(`${API_BASE}/menu/week`, { signal: controller.signal });
     clearTimeout(timeoutId);
@@ -64,12 +115,18 @@ export const fetchWeekMenu = async (): Promise<FetchResult<ResolvedMenu[]>> => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data: ResolvedMenu[] = await res.json();
-    await saveCachedWeekMenu(data);
-    return { data, isOffline: false };
+    if (Array.isArray(data) && data.length >= 7) {
+      await saveCachedWeekMenu(data);
+      return { data, isOffline: false };
+    }
+    throw new Error('Incomplete week data array');
   } catch (err) {
-    console.warn('[API] Week menu fetch failed, serving from offline cache:', err);
+    console.warn('[API] Week menu fetch failed, serving from full 7-day noticeboard cache:', err);
     const cached = await getCachedWeekMenu();
-    return { data: cached || [], isOffline: true };
+    if (cached && Array.isArray(cached) && cached.length >= 7) {
+      return { data: cached, isOffline: true };
+    }
+    return { data: EXACT_KIET_WEEKLY_FALLBACK, isOffline: true };
   }
 };
 
@@ -83,7 +140,7 @@ export const fetchMealTimings = async (): Promise<FetchResult<MealTimingsMap>> =
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), 12000);
 
     const res = await fetch(`${API_BASE}/timings`, { signal: controller.signal });
     clearTimeout(timeoutId);
