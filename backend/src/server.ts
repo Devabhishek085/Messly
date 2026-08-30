@@ -21,8 +21,7 @@ app.use(cors({
 
 app.use(express.json());
 
-// Root welcome endpoint
-app.get('/', (req: Request, res: Response) => {
+const welcomeResponse = (req: Request, res: Response) => {
   res.json({
     app: 'Messly API',
     status: 'online',
@@ -34,7 +33,11 @@ app.get('/', (req: Request, res: Response) => {
       timings: '/api/timings'
     }
   });
-});
+};
+
+// Root welcome endpoints
+app.get('/', welcomeResponse);
+app.get('/api', welcomeResponse);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
