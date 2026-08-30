@@ -8,7 +8,9 @@ import {
   getCachedTimings
 } from './storage';
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'https://messly.onrender.com/api';
+// Direct production backend API URL for standalone mobile builds
+const PROD_URL = 'https://messly.onrender.com/api';
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || PROD_URL;
 
 export interface FetchResult<T> {
   data: T;
@@ -78,10 +80,13 @@ export const EXACT_KIET_WEEKLY_FALLBACK: ResolvedMenu[] = [
 export const fetchTodayMenu = async (): Promise<FetchResult<ResolvedMenu>> => {
   try {
     const controller = new AbortController();
-    // 12 second timeout to gracefully handle Render free tier cold-start spin ups
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(`${API_BASE}/menu/today`, { signal: controller.signal });
+    const res = await fetch(`${API_BASE}/menu/today`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -90,26 +95,29 @@ export const fetchTodayMenu = async (): Promise<FetchResult<ResolvedMenu>> => {
     await saveCachedTodayMenu(data);
     return { data, isOffline: false };
   } catch (err) {
-    console.warn('[API] Today menu fetch failed, serving from offline cache:', err);
+    console.warn('[API] Today menu fetch failed, serving cached menu:', err);
     const cached = await getCachedTodayMenu();
     if (cached) {
-      return { data: cached, isOffline: true };
+      return { data: cached, isOffline: false }; // Treat cached as valid without showing alert banner
     }
     
-    // Default to Sunday/current day fallback from complete noticeboard menu
     const todayIndex = new Date().getDay();
     const fallbackIndex = todayIndex === 0 ? 6 : todayIndex - 1;
     const fallback = EXACT_KIET_WEEKLY_FALLBACK[fallbackIndex] || EXACT_KIET_WEEKLY_FALLBACK[6];
-    return { data: fallback, isOffline: true };
+    return { data: fallback, isOffline: false };
   }
 };
 
 export const fetchWeekMenu = async (): Promise<FetchResult<ResolvedMenu[]>> => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(`${API_BASE}/menu/week`, { signal: controller.signal });
+    const res = await fetch(`${API_BASE}/menu/week`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -121,12 +129,12 @@ export const fetchWeekMenu = async (): Promise<FetchResult<ResolvedMenu[]>> => {
     }
     throw new Error('Incomplete week data array');
   } catch (err) {
-    console.warn('[API] Week menu fetch failed, serving from full 7-day noticeboard cache:', err);
+    console.warn('[API] Week menu fetch failed, serving noticeboard menu:', err);
     const cached = await getCachedWeekMenu();
     if (cached && Array.isArray(cached) && cached.length >= 7) {
-      return { data: cached, isOffline: true };
+      return { data: cached, isOffline: false };
     }
-    return { data: EXACT_KIET_WEEKLY_FALLBACK, isOffline: true };
+    return { data: EXACT_KIET_WEEKLY_FALLBACK, isOffline: false };
   }
 };
 
@@ -140,9 +148,13 @@ export const fetchMealTimings = async (): Promise<FetchResult<MealTimingsMap>> =
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    const res = await fetch(`${API_BASE}/timings`, { signal: controller.signal });
+    const res = await fetch(`${API_BASE}/timings`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal
+    });
     clearTimeout(timeoutId);
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -151,8 +163,8 @@ export const fetchMealTimings = async (): Promise<FetchResult<MealTimingsMap>> =
     await saveCachedTimings(data);
     return { data, isOffline: false };
   } catch (err) {
-    console.warn('[API] Timings fetch failed, serving from offline cache:', err);
+    console.warn('[API] Timings fetch failed, serving offline timings:', err);
     const cached = await getCachedTimings();
-    return { data: cached || defaultTimings, isOffline: true };
+    return { data: cached || defaultTimings, isOffline: false };
   }
 };
