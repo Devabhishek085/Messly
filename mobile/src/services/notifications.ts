@@ -21,6 +21,17 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
+
+  // Create High-Priority Android Notification Channel for guaranteed chime & popup
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('messly_reminders', {
+      name: 'Messly Meal Reminders',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#1B3B2B',
+      sound: 'default',
+    });
+  }
   
   return finalStatus === 'granted';
 };
@@ -79,6 +90,7 @@ export const syncScheduledMealNotifications = async (
           title,
           body,
           sound: true,
+          channelId: 'messly_reminders',
           data: { meal },
         },
         trigger: {
