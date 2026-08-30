@@ -37,15 +37,15 @@ const welcomeResponse = (req: Request, res: Response) => {
 
 // Root welcome endpoints
 app.get('/', welcomeResponse);
-app.get('/api', welcomeResponse);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'messly-backend', timestamp: new Date().toISOString() });
 });
 
-// Register routes
+// Register public menu routes under /api/menu and /api
 app.use('/api/menu', publicMenuRoutes);
+app.use('/api', publicMenuRoutes);
 app.use('/api/analytics', publicAnalyticsRoutes);
 app.use('/api/admin', adminRoutes);
 
