@@ -25,7 +25,7 @@ import {
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { HeroNextMeal } from './src/components/HeroNextMeal';
 import { TodayMealsList } from './src/components/TodayMealsList';
-import { Utensils, Calendar, Bell, Settings, RefreshCw, CheckCircle2, ShieldAlert, FileText, Info } from 'lucide-react-native';
+import { Utensils, Calendar, Bell, Settings, RefreshCw, CheckCircle2, ShieldAlert, FileText, Info, Github } from 'lucide-react-native';
 
 type TabName = 'home' | 'weekly' | 'reminders' | 'settings';
 
@@ -66,7 +66,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   // Weekly screen selected day
-  const [selectedWeekDay, setSelectedWeekDay] = useState<string>('sunday');
+  const [selectedWeekDay, setSelectedWeekDay] = useState<string>('monday');
 
   // Reminders & Permission states
   const [reminders, setReminders] = useState<RemindersMap>({
@@ -421,13 +421,15 @@ export default function App() {
                   </Text>
                 </View>
 
-                {/* Issue 6: Understated Footer Credit Line (ONLY at the bottom of Settings screen) */}
-                <View style={styles.footerCreditContainer}>
+                {/* Updated Settings Footer Credit Line: "Made with ♥ by Abhishek" + GitHub Icon */}
+                <TouchableOpacity
+                  onPress={() => Linking.openURL('https://github.com/Devabhishek085')}
+                  style={styles.footerCreditContainer}
+                  activeOpacity={0.7}
+                >
                   <Text style={styles.footerCreditText}>Made with ♥ by Abhishek</Text>
-                  <TouchableOpacity onPress={() => Linking.openURL('https://github.com/Devabhishek085')}>
-                    <Text style={styles.footerCreditLink}>github.com/Devabhishek085</Text>
-                  </TouchableOpacity>
-                </View>
+                  <Github size={16} color={COLORS.accentForest} />
+                </TouchableOpacity>
               </View>
             )}
           </>
@@ -747,22 +749,17 @@ const styles = StyleSheet.create({
     color: '#181716',
   },
   footerCreditContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 24,
     paddingBottom: 16,
-    gap: 2,
+    gap: 8,
   },
   footerCreditText: {
-    fontSize: 12,
+    fontSize: 12.5,
     color: '#7A756C',
-    fontWeight: '500',
-  },
-  footerCreditLink: {
-    fontSize: 12,
-    color: COLORS.accentForest,
     fontWeight: '600',
-    textDecorationLine: 'underline',
   },
   bottomNav: {
     flexDirection: 'row',
