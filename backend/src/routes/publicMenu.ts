@@ -21,19 +21,21 @@ router.get('/today', async (req: Request, res: Response): Promise<void> => {
 // GET /api/menu/week
 router.get('/week', async (req: Request, res: Response): Promise<void> => {
   try {
-    // Get current Monday date
-    const today = new Date();
-    const day = today.getDay(); // 0 is Sun, 1 is Mon...
-    const diffToMon = today.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(today.setDate(diffToMon));
+    const todayStr = getTodayDateStr(); // YYYY-MM-DD in IST
+    const [y, m, d] = todayStr.split('-').map(Number);
+    const todayDate = new Date(Date.UTC(y, m - 1, d));
+    const day = todayDate.getUTCDay(); // 0 is Sun, 1 is Mon...
+    const diffToMon = todayDate.getUTCDate() - day + (day === 0 ? -6 : 1);
+    
+    const monday = new Date(Date.UTC(y, m - 1, diffToMon));
 
     const weekPromises = [];
     for (let i = 0; i < 7; i++) {
       const current = new Date(monday);
-      current.setDate(monday.getDate() + i);
-      const year = current.getFullYear();
-      const month = String(current.getMonth() + 1).padStart(2, '0');
-      const dayStr = String(current.getDate()).padStart(2, '0');
+      current.setUTCDate(monday.getUTCDate() + i);
+      const year = current.getUTCFullYear();
+      const month = String(current.getUTCMonth() + 1).padStart(2, '0');
+      const dayStr = String(current.getUTCDate()).padStart(2, '0');
       const dateStr = `${year}-${month}-${dayStr}`;
       weekPromises.push(resolveMenuForDate(dateStr));
     }

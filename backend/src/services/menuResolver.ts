@@ -14,17 +14,21 @@ export interface ResolvedMenu {
 }
 
 export const getDayOfWeekFromDateStr = (dateStr: string): DayOfWeek => {
-  const dateObj = new Date(dateStr + 'T00:00:00');
-  const dayIndex = dateObj.getDay();
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const dateObj = new Date(Date.UTC(year, month - 1, day));
+  const dayIndex = dateObj.getUTCDay();
   return DAYS_MAP[dayIndex];
 };
 
 export const getTodayDateStr = (): string => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  // Always resolve date according to Indian Standard Time (IST UTC+5:30)
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatter.format(new Date());
 };
 
 export const resolveMenuForDate = async (dateStr: string): Promise<ResolvedMenu> => {
