@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FBF9F4"
+      "backgroundColor": "#1B3B2B"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -22,7 +22,7 @@
       "package": "com.abhishekkpal.messly",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FBF9F4"
+        "backgroundColor": "#1B3B2B"
       }
     },
     "web": {
