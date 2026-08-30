@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment & Secrets
+.env
+.env.local
+.env.production
+
+# Build Outputs
+dist/
+build/
+.expo/
+web-build/
+*.apk
+*.aab
+
+# OS files
+.DS_Store
+Thumbs.db
