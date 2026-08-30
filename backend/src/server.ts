@@ -21,6 +21,21 @@ app.use(cors({
 
 app.use(express.json());
 
+// Root welcome endpoint
+app.get('/', (req: Request, res: Response) => {
+  res.json({
+    app: 'Messly API',
+    status: 'online',
+    hostel: 'KIET Boys Hostel',
+    endpoints: {
+      health: '/health',
+      todayMenu: '/api/menu/today',
+      weeklyMenu: '/api/menu/week',
+      timings: '/api/timings'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'messly-backend', timestamp: new Date().toISOString() });
@@ -31,7 +46,7 @@ app.use('/api/menu', publicMenuRoutes);
 app.use('/api/analytics', publicAnalyticsRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Generic error handler (does not leak sensitive error stacks to client)
+// Generic error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Unhandled Server Error:', err);
   res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
