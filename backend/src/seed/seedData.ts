@@ -71,9 +71,9 @@ export const seedDatabase = async (): Promise<void> => {
   console.log('Seeding Database...');
 
   // Seed Admin
-  const adminUsername = 'admin';
-  const adminPassword = 'admin123';
-  const existingAdmin = await Admin.findOne({ username: adminUsername });
+  const adminUsername = (process.env.ADMIN_USERNAME || 'admin').toLowerCase().trim();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const existingAdmin = await Admin.findOne({});
   if (!existingAdmin) {
     const passwordHash = await bcrypt.hash(adminPassword, 10);
     await Admin.create({
@@ -81,9 +81,9 @@ export const seedDatabase = async (): Promise<void> => {
       passwordHash,
       role: 'admin'
     });
-    console.log(`✓ Created default admin user: ${adminUsername} / ${adminPassword}`);
+    console.log(`✓ Created admin user: ${adminUsername}`);
   } else {
-    console.log('✓ Admin user already exists');
+    console.log(`✓ Admin user exists: ${existingAdmin.username}`);
   }
 
   // Seed Timings

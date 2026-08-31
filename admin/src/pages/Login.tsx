@@ -7,8 +7,8 @@ interface LoginProps {
 }
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -62,7 +62,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
         {error && <div className="toast-error">{error}</div>}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+        <form onSubmit={handleSubmit} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.35rem', color: 'var(--text-muted)' }}>
               Username
@@ -73,7 +73,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
-              placeholder="e.g. admin"
+              autoComplete="off"
+              placeholder="Username"
             />
           </div>
 
@@ -87,6 +88,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              autoComplete="new-password"
               placeholder="••••••••"
             />
           </div>
