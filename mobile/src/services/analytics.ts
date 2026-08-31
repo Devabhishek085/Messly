@@ -1,6 +1,7 @@
 import { getOrCreateDeviceId } from './storage';
 
-const API_BASE = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000/api';
+const PROD_URL = 'https://messly.onrender.com/api';
+const API_BASE = process.env.EXPO_PUBLIC_API_URL || PROD_URL;
 
 export type EventType = 'app_open' | 'menu_view' | 'reminder_enabled' | 'notification_permission_granted';
 
