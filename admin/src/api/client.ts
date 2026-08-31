@@ -21,6 +21,10 @@ const authHeaders = () => {
 };
 
 const safeJsonParse = async (res: Response) => {
+  if (res.status === 401) {
+    clearAuthToken();
+    window.dispatchEvent(new Event('messly_unauthorized'));
+  }
   const text = await res.text();
   try {
     return JSON.parse(text);

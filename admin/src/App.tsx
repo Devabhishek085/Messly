@@ -14,7 +14,14 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('weekly');
 
   useEffect(() => {
-    setIsAuthenticated(!!getAuthToken());
+    const handleUnauthorized = () => {
+      setIsAuthenticated(false);
+    };
+
+    window.addEventListener('messly_unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('messly_unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const handleLogout = () => {

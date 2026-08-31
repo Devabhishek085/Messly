@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { loginAdmin, setAuthToken } from '../api/client';
+import { loginAdmin, setAuthToken, clearAuthToken } from '../api/client';
 import { Lock, ShieldCheck } from 'lucide-react';
 
 interface LoginProps {
@@ -16,12 +16,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    clearAuthToken();
 
     try {
       const data = await loginAdmin(username, password);
       setAuthToken(data.token);
       onLoginSuccess();
     } catch (err: any) {
+      clearAuthToken();
       setError(err.message || 'Login failed. Please check credentials.');
     } finally {
       setLoading(false);
