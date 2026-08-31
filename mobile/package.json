@@ -13,6 +13,7 @@
     "@react-native-community/netinfo": "11.3.1",
     "expo": "~51.0.0",
     "expo-crypto": "~13.0.2",
+    "expo-insights": "~0.7.0",
     "expo-notifications": "~0.28.0",
     "expo-secure-store": "~13.0.2",
     "expo-status-bar": "~1.12.1",
