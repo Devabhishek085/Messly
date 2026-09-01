@@ -12,6 +12,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust proxy for Render / reverse proxies (fixes express-rate-limit ValidationError)
+app.set('trust proxy', 1);
+
 // CORS configuration
 app.use(cors({
   origin: '*', // Allow mobile & admin apps
