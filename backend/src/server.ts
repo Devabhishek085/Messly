@@ -64,6 +64,17 @@ const startServer = async () => {
     console.log(`=======================================================`);
     console.log(`🚀 Messly Backend API running on http://localhost:${PORT}`);
     console.log(`=======================================================`);
+
+    // Self keep-alive ping every 10 minutes to prevent Render free instance sleeping
+    const RENDER_URL = process.env.RENDER_EXTERNAL_URL || 'https://messly.onrender.com';
+    setInterval(async () => {
+      try {
+        await fetch(`${RENDER_URL}/health`);
+        console.log(`[Keep-Alive Ping] Successfully pinged ${RENDER_URL}/health`);
+      } catch (err) {
+        console.warn('[Keep-Alive Ping] Failed to ping health endpoint:', err);
+      }
+    }, 10 * 60 * 1000);
   });
 };
 

@@ -90,11 +90,11 @@ export const syncScheduledMealNotifications = async (
           title,
           body,
           sound: true,
-          channelId: 'messly_reminders',
           data: { meal },
         },
         trigger: {
           seconds: secondsUntil,
+          channelId: 'messly_reminders',
         },
       });
     }

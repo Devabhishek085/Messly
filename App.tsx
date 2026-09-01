@@ -15,7 +15,7 @@ import {
 import { COLORS } from './src/theme/colors';
 import { ResolvedMenu, MealTimingsMap, RemindersMap, MealKey } from './src/types';
 import { fetchTodayMenu, fetchWeekMenu, fetchMealTimings, EXACT_KIET_WEEKLY_FALLBACK } from './src/services/api';
-import { getRemindersMap, saveRemindersMap } from './src/services/storage';
+import { getRemindersMap, saveRemindersMap, getCachedTodayMenu, getCachedWeekMenu, getCachedTimings } from './src/services/storage';
 import { logAnalyticsEvent } from './src/services/analytics';
 import {
   requestNotificationPermissions,
@@ -64,6 +64,7 @@ export default function App() {
   });
   const [isOffline, setIsOffline] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Weekly screen selected day
   const [selectedWeekDay, setSelectedWeekDay] = useState<string>('monday');
@@ -83,34 +84,67 @@ export default function App() {
   }, []);
 
   const loadData = async () => {
-    setLoading(true);
+    // 1. Immediately hydrate local cached data/fallback to render UI without delay
+    try {
+      const [cachedToday, cachedWeek, cachedTimings, savedReminders, permStatus] = await Promise.all([
+        getCachedTodayMenu(),
+        getCachedWeekMenu(),
+        getCachedTimings(),
+        getRemindersMap(),
+        getNotificationPermissionStatus()
+      ]);
+
+      if (cachedToday) {
+        setTodayMenu(cachedToday);
+        if (cachedToday.dayOfWeek) {
+          setSelectedWeekDay(cachedToday.dayOfWeek.toLowerCase());
+        }
+      } else {
+        const todayIdx = new Date().getDay();
+        const fallbackIdx = todayIdx === 0 ? 6 : todayIdx - 1;
+        const initialMenu = EXACT_KIET_WEEKLY_FALLBACK[fallbackIdx] || EXACT_KIET_WEEKLY_FALLBACK[0];
+        setTodayMenu(initialMenu);
+        if (initialMenu.dayOfWeek) {
+          setSelectedWeekDay(initialMenu.dayOfWeek.toLowerCase());
+        }
+      }
+
+      if (cachedWeek && cachedWeek.length >= 7) setWeekMenu(cachedWeek);
+      if (cachedTimings) setTimings(cachedTimings);
+      setReminders(savedReminders);
+      setNotifPermission(permStatus);
+    } catch (err) {
+      console.warn('Cache hydration error:', err);
+    } finally {
+      // Instantly hide full screen loader
+      setLoading(false);
+    }
+
+    // 2. Fetch fresh data in parallel in background
+    setIsRefreshing(true);
     logAnalyticsEvent('app_open');
 
-    const todayRes = await fetchTodayMenu();
-    setTodayMenu(todayRes.data);
-    setIsOffline(todayRes.isOffline);
+    try {
+      const [todayRes, timingsRes, weekRes] = await Promise.all([
+        fetchTodayMenu(),
+        fetchMealTimings(),
+        fetchWeekMenu()
+      ]);
 
-    if (todayRes.data?.dayOfWeek) {
-      setSelectedWeekDay(todayRes.data.dayOfWeek.toLowerCase());
+      if (todayRes?.data) {
+        setTodayMenu(todayRes.data);
+        setIsOffline(todayRes.isOffline);
+        if (todayRes.data.dayOfWeek) {
+          setSelectedWeekDay(todayRes.data.dayOfWeek.toLowerCase());
+        }
+      }
+      if (timingsRes?.data) setTimings(timingsRes.data);
+      if (weekRes?.data && weekRes.data.length >= 7) setWeekMenu(weekRes.data);
+    } catch (err) {
+      console.warn('Background menu sync error:', err);
+    } finally {
+      setIsRefreshing(false);
     }
-
-    const timingsRes = await fetchMealTimings();
-    setTimings(timingsRes.data);
-
-    const weekRes = await fetchWeekMenu();
-    if (weekRes.data && weekRes.data.length >= 7) {
-      setWeekMenu(weekRes.data);
-    } else {
-      setWeekMenu(EXACT_KIET_WEEKLY_FALLBACK);
-    }
-
-    const savedReminders = await getRemindersMap();
-    setReminders(savedReminders);
-
-    const permStatus = await getNotificationPermissionStatus();
-    setNotifPermission(permStatus);
-
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -199,8 +233,8 @@ export default function App() {
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.headerClock}>{formatHeaderTime(currentTime)}</Text>
-          <TouchableOpacity onPress={loadData} style={styles.refreshBtn}>
-            <RefreshCw size={14} color="#686259" />
+          <TouchableOpacity onPress={loadData} style={styles.refreshBtn} disabled={isRefreshing}>
+            <RefreshCw size={14} color={isRefreshing ? COLORS.accentForest : "#686259"} />
           </TouchableOpacity>
         </View>
       </View>
